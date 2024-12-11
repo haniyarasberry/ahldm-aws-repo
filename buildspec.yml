@@ -19,5 +19,8 @@ post_build:
     - docker push 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
     - echo Writing image definitions file...
     - printf "[{"name":"ahldm-react-app","imageUri":"962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest"}]" > imagedefinitions.json
+    - echo Verifying imagedefinitions.json...
+    - ls -l
+    - cat imagedefinitions.json
 artifacts:
   files: imagedefinitions.json
