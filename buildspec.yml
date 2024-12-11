@@ -13,7 +13,6 @@ build:
     - cd src
     - docker build -t ahldm-image:latest .
     - docker tag ahldm-image:latest 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
-    - cd ..
 post_build:
   commands:
     - echo build Docker image complete `date`
