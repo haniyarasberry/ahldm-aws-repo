@@ -1,26 +1,33 @@
-version: 0.2 
+version: 0.2
 phases:
   install:
     commands:
-      - echo install step...
-  pre_build:
-    commands:
-      - echo logging in to AWS ECR...
-      - $(aws ecr get-login --no-include-email --region us-west-2)
-  build:
-    commands:
-      - echo build Docker image on `date`
-      - docker build -t ahldm-image:latest .
-      - docker tag ahldm-image:latest 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
-  post_build:
-    commands:
-      - echo build Docker image complete `date`
-      - echo push latest Docker images to ECR...
-      - docker push 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
-      - echo Writing image definitions file...
-      - printf '[{"name":"ahldm-react-app","imageUri":"962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest"}]' > imagedefinitions.json
-      - echo Verifying imagedefinitions.json...
-      - ls -l
-      - cat imagedefinitions.json
-artifacts:
-  files: imagedefinitions.json
+    - echo Installing app dependencies...
+    - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+    - echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+    - source ~/.bashrc
+    - echo 'Check kubectl version'
+    - kubectl version --short --client
+pre_build:
+  commands:
+    - echo Logging into Amazon EKS...
+    - aws eks --region us-east-1 update-kubeconfig --name cicd-demo
+    - echo check config
+    - kubectl config view --minify
+    - echo check kubectl access
+    - kubectl get svc
+    - echo logging in to AWS ECR...
+    - $(aws ecr get-login --no-include-email --region us-west-2)
+build:
+  commands:
+    - docker build -ahldm-image .
+post_build:
+  commands:
+    - docker tag ahldm-image 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
+    - docker push 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
+    - kubectl apply -f deployment.yaml
+    - kubectl apply -f service.yaml
+    - kubectl rollout restart -f deployment.yaml
+    - kubectl get svc --all-namespaces
