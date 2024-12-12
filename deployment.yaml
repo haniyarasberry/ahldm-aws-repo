@@ -10,16 +10,16 @@ metadata:
 spec:
   replicas: 1
   selector:
-  matchLabels:
-    app: cicd-demo
-template:
-  metadata:
-    labels:
+    matchLabels:
       app: cicd-demo
-spec:
-  containers:
-    - image: 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
-      imagePullPolicy: Always
-      name: cicd-demo
-      ports:
-        - containerPort: <Port>
+  template:
+    metadata:
+      labels:
+        app: cicd-demo
+    spec:
+      containers:
+      - image: 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
+        imagePullPolicy: Always
+        name: cicd-demo
+        ports:
+          - containerPort: 3000
