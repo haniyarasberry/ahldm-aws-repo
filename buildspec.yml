@@ -13,7 +13,7 @@ phases:
 pre_build:
   commands:
     - echo Logging into Amazon EKS...
-    - aws eks --region us-east-1 update-kubeconfig --name cicd-demo
+    - aws eks --region us-west-2 update-kubeconfig --name cicd-demo
     - echo check config
     - kubectl config view --minify
     - echo check kubectl access
@@ -22,7 +22,7 @@ pre_build:
     - $(aws ecr get-login --no-include-email --region us-west-2)
 build:
   commands:
-    - docker build -ahldm-image .
+    - docker build -t ahldm-image .
 post_build:
   commands:
     - docker tag ahldm-image 962804699607.dkr.ecr.us-west-2.amazonaws.com/ahldmrepo:latest
